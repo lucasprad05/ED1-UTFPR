@@ -21,7 +21,7 @@ bool vaziaArvore(PtrNoArvore *no){
 
 bool inserirArvore(PtrNoArvore *no, int valor){
     //condicoes de parada recursao
-    //1 - achei ponto inserÁao
+    //1 - achei ponto inser√ßao
     if((*no) == NULL){
         (*no) = malloc(sizeof(NoArvore));
         (*no)->direita = NULL;
@@ -79,11 +79,66 @@ bool pesquisaArvore(PtrNoArvore *no, int valor){
     }//else
 }//pesquisaArvore
 
+PtrNoArvore procuraMaior(PtrNoArvore *no){
+    while((*no)->direita!= NULL){
+        (*no) = (*no)->direita;
+    }//while
+    PtrNoArvore ret = (*no);
+    (*no) = (*no)->esquerda;
+    return (ret);
+}//procuraMaior
+
+//--------------------------------------------------------
+//REMOCAO
+//--------------------------------------------------------
+bool removeArvore(PtrNoArvore *no, int valor){
+//pode nao encontrar o valor(NULL)-> return false
+    if((*no) == NULL) return false;
+
+//se encontrar
+    if((*no)->chave == valor){
+        PtrNoArvore tmp = (*no);
+
+        //caso 1 folha: no = NULL
+        if((*no)->direita == NULL && (*no)->esquerda == NULL){
+            (*no) = NULL;
+        }
+        //caso 2 subarvore esq existe: no-esq
+        else if((*no)->direita == NULL && (*no)->esquerda != NULL){
+            (*no) = (*no)->esquerda;
+        }
+        //caso 3 subarvore dir existe: no-dir
+        else if((*no)->direita != NULL && (*no)->esquerda == NULL){
+            (*no) = (*no)->direita;
+        }else{
+        //caso 4 tem duas subarvores:
+            //A: maior elemento subarvore esq
+            //B: menor elemento subarvore dir
+            tmp = procuraMaior(&(*no)->esquerda);
+            (*no)->chave = tmp->chave;
+        }//else
+    free(tmp);
+    return true;
+    }//if
+
+//se nao
+//recursiva
+    if(valor > (*no)->chave){
+        return(removeArvore(&(*no)->direita, valor));
+    }else{
+        return (removeArvore(&(*no)->esquerda, valor));
+    }//else
+}//removeArvore
+
+//funcao auxiliar (procura maximo na subarvore esquerda)
+
+
+
 int main(){
     PtrNoArvore raiz;
     iniciaArvore(&raiz);
     if(vaziaArvore(&raiz)){
-        printf("Est· Vazia!\n");
+        printf("Est√° Vazia!\n");
     }else{
         printf("Arvore contem elementos\n");
     }//else
@@ -105,13 +160,16 @@ int main(){
     posOrdemArvore(&raiz);
     printf("\n");
 
-    int consula[] = {17, 13, -11, 12};
+    int consulta[] = {17, 13, -11, 12};
     for(int i = 0; i < 4; i++){
-        if(pesquisaArvore(&raiz, consula[i])){
+        if(pesquisaArvore(&raiz, consulta[i])){
             printf("achou!\n");
         }else{
             printf("nao achou!\n");
         }//else
     }//for
+
+    removeArvore(&raiz, -10);
+    preOrdemArvore(&raiz);
     return 0;
 }//main
